@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/', 'PrincipalController@principal')->name('site.principal');
+Route::get('/', 'PrincipalController@principal')->name('site.principal')->middleware('log.acesso');
+
 Route::get('/contato', 'ContatoController@contato')->name('site.contato');
 Route::post('/contato', 'ContatoController@salvar')->name('site.contato');
 Route::get('/sobre-nos', 'SobreNosController@sobreNos')->name('site.sobrenos');
@@ -20,9 +21,12 @@ Route::get('/sobre-nos', 'SobreNosController@sobreNos')->name('site.sobrenos');
 Route::get('/login', function(){ return 'Login'; });
 
 Route::prefix('/app')->group(function(){
-    Route::get('/clientes', function(){ return 'clientes'; })->name('app.clientes');
-    Route::get('/fornecedores', 'FornecedorController@index')->name('app.fornecedores');
-    Route::get('/produtos', function(){ return 'produtos'; })->name('app.produtos');
+    Route::middleware('autenticacao')
+           ->get('/clientes', function(){ return 'clientes'; })->name('app.clientes');
+    Route::middleware('autenticacao')
+           ->get('/fornecedores', 'FornecedorController@index')->name('app.fornecedores');
+    Route::middleware('autenticacao')
+           ->get('/produtos', function(){ return 'produtos'; })->name('app.produtos');
 });
 
 

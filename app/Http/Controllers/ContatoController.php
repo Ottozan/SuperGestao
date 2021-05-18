@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\SiteContato;
+use App\MotivoContato;
 
 class ContatoController extends Controller
 {
     public function contato(Request $request){
+
+        $motivo_contatos = MotivoContato::all();
 
         /*
         echo '<pre>';
@@ -36,19 +39,33 @@ class ContatoController extends Controller
         */
         // print_r($contato->getAttributes());
 
-        return view('site.contato', ['titulo' => 'Contato (teste)']);;
+        return view('site.contato', ['titulo' => 'Contato (teste)', 'motivo_contatos' => $motivo_contatos]);
     }
 
     public function salvar(Request $request) {
         // validação dos dados do formulário recebidos no request
         $request->validate([
-            'nome' => required,
-            'email' => required,
-            'telefone' => required,
-            'motivo_contato' => required,
-            'mensagem' => required
+            'nome' => 'required|min:3|max:40|unique:site_contatos',
+            'email' => 'email',
+            'telefone' => 'required',
+            'motivo_contatos_id' => 'required',
+            'mensagem' => 'required'
+        ],
+        [
+            'nome.required' => 'O campo nome é obrigatório.',
+            'nome.min' => 'O campo nome precisa ter ao menos três caracteres.',
+            'nome.max' => 'O campo nome execede 40 caracteres.',
+            'nome.unique' => 'O campo nome deve ser único.',
+            'email.email' => 'e-mail inválido!',
+            // 'telefone.required' => 'Telefone precisa ser informado.',
+            // 'motivo_contatos_id.required' => 'Selecione um motico para o contato.',
+            'mensagem.required' => 'Você esqueceu de digitar a mensagem.',
 
-        ]);
-        //SiteContato::create($request->all());
+            'required' => 'O campo :attribute precisa ser preenchido'
+        ]
+
+    );
+        SiteContato::create($request->all());
+        return redirect()->route('site.principal');
     }
 }
