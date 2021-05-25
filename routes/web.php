@@ -18,15 +18,23 @@ Route::get('/contato', 'ContatoController@contato')->name('site.contato');
 Route::post('/contato', 'ContatoController@salvar')->name('site.contato');
 Route::get('/sobre-nos', 'SobreNosController@sobreNos')->name('site.sobrenos');
 
-Route::get('/login', function(){ return 'Login'; });
+Route::get('/login/{erro?}', 'LoginController@index')->name('site.login');
+Route::post('/login', 'LoginController@autenticar')->name('site.login');
 
-Route::prefix('/app')->group(function(){
-    Route::middleware('autenticacao')
-           ->get('/clientes', function(){ return 'clientes'; })->name('app.clientes');
-    Route::middleware('autenticacao')
-           ->get('/fornecedores', 'FornecedorController@index')->name('app.fornecedores');
-    Route::middleware('autenticacao')
-           ->get('/produtos', function(){ return 'produtos'; })->name('app.produtos');
+Route::middleware('autenticacao:padrao')->prefix('/app')->group(function(){
+    Route::get('/home', 'HomeController@index')->name('app.home');
+    Route::get('/sair', 'LoginController@sair')->name('app.sair');
+
+    Route::get('/cliente', 'ClienteController@index')->name('app.cliente');
+
+    Route::get('/fornecedor', 'FornecedorController@index')->name('app.fornecedor');
+    Route::post('/fornecedor/listar', 'FornecedorController@listar')->name('app.fornecedor.listar');
+    Route::get('/fornecedor/listar', 'FornecedorController@listar')->name('app.fornecedor.listar');
+    Route::get('/fornecedor/adicionar', 'FornecedorController@adicionar')->name('app.fornecedor.adicionar');
+    Route::post('/fornecedor/adicionar', 'FornecedorController@adicionar')->name('app.fornecedor.adicionar');
+    Route::get('/fornecedor/editar/{id}/{msg?}', 'FornecedorController@editar')->name('app.fornecedor.editar');
+
+    Route::get('/produto', 'ProdutoController@index')->name('app.produto');
 });
 
 

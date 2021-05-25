@@ -3,23 +3,79 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Fornecedor;
 
 class FornecedorController extends Controller
 {
     public function index() {
-        $fornecedores = [
-            0 => ['nome'=> 'Fornecedor 1',
-            'status' => 'Inativo',
-            'cnpj' => ''], // '0' vazio, empty(), '00', não vazio
-            1 => ['nome'=> 'Fornecedor 2',
-            'status' => 'Ativo']
-        ];
+        return view('app.fornecedor.index');
+    }
 
-        // Operador ternario
-        // condicao ? se verdadeiro :  valor se falso
-        // $msg = isset($fornecedores[1]['cnpj']) ? 'CNPJ informado': 'CNPJ não informado';
-        // echo $msg;
+    public function listar(Request $request) {
+        $fornecedores = Fornecedor::where('nome', 'like', '%'.$request->input('nome').'%')
+            ->where('site', 'like', '%'.$request->input('site').'%')
+            ->where('uf', 'like', '%'.$request->input('uf').'%')
+            ->where('email', 'like', '%'.$request->input('email').'%')
+            ->get();
+        // dd($fornecedores);
+        return view('app.fornecedor.listar', ['fornecedores' => $fornecedores]);
+    }
 
-        return view('app.fornecedor.index', compact('fornecedores'));
+    public function adicionar(Request $request)  {
+
+        $msg = '';
+        // Inclusão
+        if($request->input('_token') != '' && $request->input('id') == '') {
+            // validação
+            $regras = [
+                'nome' => 'required|min:3|max:40',
+                'site' => 'required',
+                'uf' => 'required|min:2|max:2',
+                'email' => 'email'
+            ];
+
+            $feedback = [
+                'required' => 'O campo :attribute deve ser preenchido.',
+                'nome.min' => 'O campo nome deve ter ao menos 3 caracteres',
+                'nome.max' => 'O campo nome deve ter no máximo 40 caracteres',
+                'uf.min' => 'O campo uf deve ter ao menos 2 caracteres',
+                'uf.max' => 'O campo uf deve ter no máximo 2 caracteres',
+                'email.email' => 'O campo e-mail deve conter um e-mail válido.'
+            ];
+
+            $request->validate($regras, $feedback);
+
+            $fornecedor = new Fornecedor();
+            $fornecedor->create($request->all());
+
+            // redirect
+
+            // dados view
+            $msg = 'Cadastro realizado com sucesso!';
+        }
+
+        // Edição
+        if($request->input('_token') != '' && $request->input('id') != '') {
+
+            $fornecedor = Fornecedor::find($request->input('id'));
+            $update = $fornecedor->update($request->all());
+
+            if($update) {
+                $msg = 'Registro alterado com sucesso!';
+            } else {
+                $msg = 'Registro não pode ser alterado!!!';
+            }
+            return redirect()->route('app.fornecedor.editar', ['id' => $request->input('id'), 'msg' => $msg]);
+        }
+
+        return view('app.fornecedor.adicionar', ['msg' => $msg]);
+    }
+
+    public function editar($id, $msg = '') {
+
+        $fornecedor = Fornecedor::find($id);
+
+        return view('app.fornecedor.adicionar', ['fornecedor' => $fornecedor, 'msg' => $msg]);
+
     }
 }
