@@ -13,4 +13,9 @@ class Fornecedor extends Model
     protected $table = 'fornecedores';
     //Para permitir criar um registro usando Create...
     protected $fillable = ['nome', 'site', 'uf', 'email'];
+
+    public function produtos() {
+        return $this->hasMany('App\Item', 'fornecedor_id', 'id');
+        // return this.hasMany('App\Item');
+    }
 }

@@ -27,7 +27,7 @@
                      <th>E-mail</th>
                      <th></th>
                      <th></th>
-                  </tr>
+
                </head>
                <tbody>
                   @foreach ($fornecedores as $fornecedor)
@@ -36,12 +36,40 @@
                         <td>{{ $fornecedor->site }}</td>
                         <td>{{ $fornecedor->uf }}</td>
                         <td>{{ $fornecedor->email }}</td>
-                        <td>Excluir</td>
+                        <td><a href="{{ route('app.fornecedor.excluir', $fornecedor->id) }}">Excluir</a></td>
                         <td><a href="{{ route('app.fornecedor.editar', $fornecedor->id) }}">Editar</a></td>
                      </tr>
+                  </tr>
+                  <tr>
+                     <td colspan="6">
+                        <p>Lista de Produtos</p>
+                        <table border="1" style="margin:20px">
+                           <thead>
+                              <tr>
+                                 <th>ID</th>
+                                 <th>Nome</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {{-- {{ $fornecedor->produtos->toJson() }} --}}
+                              @foreach ($fornecedor->produtos as $key => $produto)
+                              <tr>
+                                 <td>{{ $produto->id }}</td>
+                                 <td>{{ $produto->nome }}</td>
+                              </tr>
+                              @endforeach
+                           </tbody>
+                        </table>
+                     </td>
+                  </tr>
                   @endforeach
                </tbody>
             </table>
+
+            {{ $fornecedores->appends($request)->links() }}
+            <br>
+            Exibindo
+            Exibindo {{ $fornecedores->count()}} Fornecedores de {{ $fornecedores->total() }} (de {{ $fornecedores->firstItem() }} a {{ $fornecedores->lastItem() }})
          </div>
 
       </div>
